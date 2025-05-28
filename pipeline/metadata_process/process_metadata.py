@@ -6,7 +6,7 @@ from tqdm import tqdm
 from zhipuai import ZhipuAI
 
 
-def keep_chinese_and_punctuation_regex(text):
+def keep_chinese_and_punctuation(text):
     pattern = r"[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]"
     return "".join(re.findall(pattern, text))
 
@@ -35,7 +35,7 @@ with open(info_file) as f1:
                     },
                 ],
             )
-            translated_title = keep_chinese_and_punctuation_regex(
+            translated_title = keep_chinese_and_punctuation(
                 response.choices[0].message.content
             )
 
