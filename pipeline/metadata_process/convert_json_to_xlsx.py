@@ -10,6 +10,11 @@ def json_to_excel(json_file_path, excel_file_path):
         for line in f:
             try:
                 json_obj = json.loads(line.strip())
+
+                if "id" in json_obj and json_obj["id"] is not None:
+                    url = f"https://www.youtube.com/watch?v={json_obj['id']}"
+                    json_obj["id"] = f'=HYPERLINK("{url}", "{json_obj['id']}")'
+
                 data.append(json_obj)
             except json.JSONDecodeError as e:
                 print(f"Skipping malformed JSON line: {line.strip()} - Error: {e}")
