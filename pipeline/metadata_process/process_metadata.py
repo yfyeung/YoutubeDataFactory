@@ -1,8 +1,19 @@
 import json
+import re
 import sys
-from tqdm import tqdm
 
+from tqdm import tqdm
 from zhipuai import ZhipuAI
+
+
+def keep_chinese_and_punctuation_regex(text):
+    pattern = r"[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]"
+    return "".join(re.findall(pattern, text))
+
+
+def keep_enlish_letters(text):
+    return "".join(filter(str.isalpha, text))
+
 
 info_file = sys.argv[1]
 api_key = sys.argv[2]
@@ -24,18 +35,20 @@ with open(info_file) as f1:
                     },
                 ],
             )
-            translated_title = response.choices[0].message.content
+            translated_title = keep_chinese_and_punctuation_regex(
+                response.choices[0].message.content
+            )
 
             response = client.chat.completions.create(
                 model="glm-4-flash",
                 messages=[
                     {
                         "role": "user",
-                        "content": f"根据 youtube 视频的 title，直接给出一个英文单词描述其类别: {title}",
+                        "content": f"Given YouTube video title, directly output a single English word subject, very broad domain like Politics, Economics, Culture, Military, Technology, Society, Environment, Health, Education, Sports, Crime: {title}",
                     },
                 ],
             )
-            category = response.choices[0].message.content
+            category = keep_enlish_letters(response.choices[0].message.content)
 
             info["translated_title"] = translated_title
             info["category"] = category
